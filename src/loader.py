@@ -4,6 +4,9 @@ import os
 import io
 import shutil
 import copy
+import sys
+import glob
+import pandas as pd
 from datetime import datetime
 from pick import pick
 from time import sleep
@@ -34,7 +37,7 @@ class SlackDataLoader:
         '''
         self.path = path
         self.channels = self.get_channels()
-        self.users = self.get_ussers()
+        self.users = self.get_users()
     
 
     def get_users(self):
@@ -82,3 +85,36 @@ if __name__ == "__main__":
     
     parser.add_argument('--zip', help="Name of a zip file to import")
     args = parser.parse_args()
+
+# Add parent directory to path to import modules from src
+rpath = os.path.abspath('..')
+if rpath not in sys.path:
+    sys.path.insert(0, rpath)
+
+def parse_slack_reaction(path, channel):
+    """get reactions"""
+    dfall_reaction = pd.DataFrame()
+    combined = []
+    for json_file in glob.glob(f"{path}*.json"):
+        with open(json_file, 'r') as slack_data:
+            combined.append(slack_data)
+
+    reaction_name, reaction_count, reaction_users, msg, user_id = [], [], [], [], []
+
+    for k in combined:
+        slack_data = json.load(open(k.name, 'r', encoding="utf-8"))
+        
+        for i_count, i in enumerate(slack_data):
+            if 'reactions' in i.keys():
+                for j in range(len(i['reactions'])):
+                    msg.append(i['text'])
+                    user_id.append(i['user'])
+                    reaction_name.append(i['reactions'][j]['name'])
+                    reaction_count.append(i['reactions'][j]['count'])
+                    reaction_users.append(",".join(i['reactions'][j]['users']))
+                
+    data_reaction = zip(reaction_name, reaction_count, reaction_users, msg, user_id)
+    columns_reaction = ['reaction_name', 'reaction_count', 'reaction_users_count', 'message', 'user_id']
+    df_reaction = pd.DataFrame(data=data_reaction, columns=columns_reaction)
+    df_reaction['channel'] = channel
+    return df_reaction
