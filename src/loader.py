@@ -76,16 +76,6 @@ class SlackDataLoader:
             userIdsByName[user['name']] = user['id']
         return userNamesById, userIdsByName        
 
-
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Export Slack history')
-
-    
-    parser.add_argument('--zip', help="Name of a zip file to import")
-    args = parser.parse_args()
-
 # Add parent directory to path to import modules from src
 rpath = os.path.abspath('..')
 if rpath not in sys.path:
@@ -201,4 +191,13 @@ def get_community_participation(path):
                 for i in msg['replies']:
                     comm_dict[i['user']] = comm_dict.get(i['user'], 0)+1
     return comm_dict
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Export Slack history')
+
+    
+    parser.add_argument('--zip', help="Name of a zip file to import")
+    args = parser.parse_args()
+
+
 
