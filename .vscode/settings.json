@@ -34,5 +34,8 @@
     "python.linting.flake8Path": "${env:HOME}/.local/bin/flake8",
     "python.formatting.blackPath": "${env:HOME}/.local/bin/black",
     "python.analysis.typeCheckingMode": "basic",
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "python.analysis.extraPaths": [
+        "./src"
+    ]
 }
